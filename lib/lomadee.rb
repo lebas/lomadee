@@ -2,6 +2,8 @@ require 'lomadee/version'
 require 'nokogiri'
 require 'open-uri'
 require 'pry'
+require 'net/http'
+require 'json'
 
 module Lomadee
   URL_SANDBOX = 'http://sandbox.buscape.com.br/'
@@ -25,16 +27,33 @@ module Lomadee
       end
     end
 
-    def get_stores
+    def get_suppliers
       prod = []
       unless @server_url.nil?
-        url_page = "#{@server_url}service/sellers/lomadee/#{@api_id}/BR?sourceId=#{@source_id}"
-        puts url_page
-        @page = Nokogiri::XML(open(url_page))
+        url_page = "#{@server_url}service/sellers/lomadee/#{@api_id}/BR?sourceId=#{@source_id}&format=json"
+        response = Net::HTTP.get(URI(url_page))
+        @page = JSON.parse(response)
         unless @page.nil?
-          binding.pry
+          if  @page["details"]["message"] == "success"
+            sellers = @page["sellers"]
+            sellers.each do |supplier|
+               url = supplier["links"]
+               url.each do |item|
+                url_offerlist = item["url"] if item["type"] == "link_to_offerlist"
+               end
+              prod << { 
+                :id => supplier["id"], 
+                :advertiser_id => supplier["advertiserId"], 
+                :name => supplier["name"], 
+                :thumbnail => supplier["thumbnail"], 
+                :with_offerlist => supplier["withOffers"],
+                :url_offerlist => url_offerlist
+              }
+            end
+          end
         end
       end
+      prod
     end
 
     def get_products_with_keyword(keyword = nil)
