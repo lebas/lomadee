@@ -16,13 +16,23 @@ module Lomadee
       end
     end
 
+    ### lomadeezar links da Americanas, submarinio ... 
+    def add_link(url = nil)
+      unless @api_id.nil? || @source_id.nil? || url.nil?
+        url_page = "#{@server_url}service/createLinks/lomadee/#{@api_id}/BR/?sourceId=#{@source_id}&link1=#{url}"
+        @page = Nokogiri::XML(open(url_page))
+        return @page.css("redirectLink").children.text unless @page.nil? || @page.css("redirectLink").nil? || @page.css("redirectLink").children.nil?
+      end
+    end
+
     def get_stores
       prod = []
       unless @server_url.nil?
-        url_page = "http://sandbox.buscape.com.br/service/sellers/lomadee/#{@api_id}/BR?sourceId=#{@source_id}"
+        url_page = "#{@server_url}service/sellers/lomadee/#{@api_id}/BR?sourceId=#{@source_id}"
+        puts url_page
         @page = Nokogiri::XML(open(url_page))
-        if !@page.nil?
-
+        unless @page.nil?
+          binding.pry
         end
       end
     end
@@ -31,6 +41,7 @@ module Lomadee
       prod = []
       unless @server_url.nil?
         url_page = "#{@server_url}service/findProductList/lomadee/#{@api_id}/BR/?sourceId=#{@source_id}&keyword=#{keyword.downcase}"
+        puts url_page
         @page = Nokogiri::XML(open(url_page))
         if !@page.nil? && !@page.css("details").css("status").nil? && @page.css("details").css("status").text == "success"
           @page.css("product").each do |item|
@@ -52,7 +63,7 @@ module Lomadee
     def get_offers(category = nil)
       prod = []
       unless @server_url.nil?
-        url_page = "#{@server_url}service/findOfferList/lomadee/#{@api_id}/BR/?sourceId=#{@source_id}&CategoryId=#{category}"
+        url_page = "#{@server_url}service/findOfferList/lomadee/#{@api_id}/BR/?sourceId=#{@source_id}&CategoryId=#{category}&sort=dprice"
         @page = Nokogiri::XML(open(url_page))
         if !@page.nil? && !@page.css("details").css("status").nil? && @page.css("details").css("status").text == "success"
           @page.css("offer").each do |item|
