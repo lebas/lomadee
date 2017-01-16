@@ -94,7 +94,7 @@ module Lomadee
               :url =>  item.css('link').attr('url').text,
               :offer => item.css('link').attr('type').text == "offer" ? true : false, 
               :price => item.css('price').css('value').css('value').text, 
-              :seller => item.css('seller').css('sellerName').text
+              :seller => item.css('seller').attr('id').value.to_i
             }
           end
         else
