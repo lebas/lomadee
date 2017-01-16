@@ -38,16 +38,15 @@ module Lomadee
             sellers = @page["sellers"]
             sellers.each do |supplier|
                url = supplier["links"]
-               url.each do |item|
-                url_offerlist = item["url"] if item["type"] == "link_to_offerlist"
-               end
+               @url_offerlist = ''
+               url.map{|x| @url_offerlist = x["url"] if x["type"] == "link_to_offerlist" }
               prod << { 
                 :id => supplier["id"], 
                 :advertiser_id => supplier["advertiserId"], 
                 :name => supplier["name"], 
                 :thumbnail => supplier["thumbnail"], 
                 :with_offerlist => supplier["withOffers"],
-                :url_offerlist => url_offerlist
+                :url_offerlist => @url_offerlist
               }
             end
           end
