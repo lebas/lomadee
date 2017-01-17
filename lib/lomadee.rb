@@ -58,7 +58,8 @@ module Lomadee
     def get_products_with_keyword(keyword = nil)
       prod = []
       unless @server_url.nil?
-        url_page = "#{@server_url}service/findProductList/lomadee/#{@api_id}/BR/?sourceId=#{@source_id}&keyword=#{keyword.to_ascii.downcase}"
+        keyword = keyword.to_ascii unless keyword.ascii_only?
+        url_page = "#{@server_url}service/findProductList/lomadee/#{@api_id}/BR/?sourceId=#{@source_id}&keyword=#{keyword.downcase}"
         @page = Nokogiri::XML(open(url_page))
         if !@page.nil? && !@page.css("details").css("status").nil? && @page.css("details").css("status").text == "success"
           @page.css("product").each do |item|
