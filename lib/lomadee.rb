@@ -63,7 +63,8 @@ module Lomadee
         if !@page.nil? && !@page.css("details").css("status").nil? && @page.css("details").css("status").text == "success"
           @page.css("product").each do |item|
             prod << { 
-              :product_name => item.css("productName").text,
+              :long_name => item.css("productName").text,
+              :product_name => item.css("productShortName").text,
               :id => item.attr("id"), 
               :category_id => item.attr("categoryId"), 
               :price_min => item.css("priceMin").text, 
