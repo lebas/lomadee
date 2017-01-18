@@ -58,17 +58,20 @@ module Lomadee
     def get_products_with_keyword(keyword = nil)
       prod = []
       if !@server_url.nil? && keyword.ascii_only?
-        url_page = "#{@server_url}service/findProductList/lomadee/#{@api_id}/BR/?sourceId=#{@source_id}&keyword=#{keyword.downcase}"
+        url_page = "#{@server_url}service/findProductList/buscape//#{@api_id}/BR/?sourceId=#{@source_id}&keyword=#{keyword.downcase}"
         @page = Nokogiri::XML(open(url_page))
         if !@page.nil? && !@page.css("details").css("status").nil? && @page.css("details").css("status").text == "success"
           @page.css("product").each do |item|
+            buscape_page = nil
+            item.css("links").css("links").map{|link| buscape_page = link.css('link').attr('url').text if (link.css('link').attr("type").to_s == "product") }
             prod << { 
               :long_name => item.css("productName").text,
               :product_name => item.css("productShortName").text,
               :id => item.attr("id"), 
               :category_id => item.attr("categoryId"), 
               :price_min => item.css("priceMin").text, 
-              :price_max => item.css("priceMax").text
+              :price_max => item.css("priceMax").text, 
+              :product_page => buscape_page
             }
           end
         else
