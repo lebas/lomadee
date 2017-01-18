@@ -59,6 +59,7 @@ module Lomadee
       prod = []
       if !@server_url.nil? && keyword.ascii_only?
         url_page = "#{@server_url}service/findProductList/buscape//#{@api_id}/BR/?sourceId=#{@source_id}&keyword=#{keyword.downcase}"
+        binding.pry
         @page = Nokogiri::XML(open(url_page))
         if !@page.nil? && !@page.css("details").css("status").nil? && @page.css("details").css("status").text == "success"
           @page.css("product").each do |item|
