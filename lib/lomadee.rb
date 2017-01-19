@@ -34,20 +34,22 @@ module Lomadee
         @page = Nokogiri::HTML(open(buscape_url))
         list = @page.css('ul.offers-list__items').css('li.offers-list__item')
         list.each do |item|
-          lomadee_id = (item.css('form').css('input')[1].attr('name') == 'offer_id') ? item.css('form').css('input')[1].attr('value') : nil
-          offer_url = (item.css('form').css('input')[0].attr('name') == 'url') ? item.css('form').css('input')[0].attr('value') : nil
-          seller_id = (item.css('form').css('input')[2].attr('name') == 'emp_id') ?  item.css('form').css('input')[2].attr('value') : nil
-          prod << { 
-            :category_id =>  item.css('form').css('input')[4].attr('value').split('|')[9].to_i,
-            :lomadee_id => lomadee_id,
-            :product_id => item.css('form').css('input')[4].attr('value').split('|')[10].to_i,
-            :sku => nil, 
-            :offer_name => list.css('div').css('a').css('img')[0].attr('alt'),
-            :url => offer_url,
-            :offer => true, 
-            :price =>  item.css('form').attr('data-currentvalue').text.to_f, 
-            :seller => seller_id
-          }
+          unless item.css('form').css('input').empty?
+            lomadee_id = (item.css('form').css('input')[1].attr('name') == 'offer_id') ? item.css('form').css('input')[1].attr('value') : nil
+            offer_url = (item.css('form').css('input')[0].attr('name') == 'url') ? item.css('form').css('input')[0].attr('value') : nil
+            seller_id = (item.css('form').css('input')[2].attr('name') == 'emp_id') ?  item.css('form').css('input')[2].attr('value') : nil
+            prod << { 
+              :category_id =>  item.css('form').css('input')[4].attr('value').split('|')[9].to_i,
+              :lomadee_id => lomadee_id,
+              :product_id => item.css('form').css('input')[4].attr('value').split('|')[10].to_i,
+              :sku => nil, 
+              :offer_name => list.css('div').css('a').css('img')[0].attr('alt'),
+              :url => offer_url,
+              :offer => true, 
+              :price =>  item.css('form').attr('data-currentvalue').text.to_f, 
+              :seller => seller_id
+            }
+          end
         end
       end
       prod
