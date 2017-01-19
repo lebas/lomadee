@@ -5,6 +5,7 @@ require 'pry'
 require 'net/http'
 require 'json'
 
+# http://developer.buscape.com.br/portal/lomadee/api-de-ofertas/recursos
 module Lomadee
   URL_SANDBOX = 'http://sandbox.buscape.com.br/'
   URL_PRODUCT = 'http://bws.buscape.com.br/'
@@ -25,6 +26,31 @@ module Lomadee
         @page = Nokogiri::XML(open(url_page))
         return @page.css("redirectLink").children.text unless @page.nil? || @page.css("redirectLink").nil? || @page.css("redirectLink").children.nil?
       end
+    end
+
+    def read_buscape(buscape_url = nil)
+      prod = []
+      unless buscape_url.nil?
+        @page = Nokogiri::HTML(open(buscape_url))
+        list = @page.css('ul.offers-list__items').css('li.offers-list__item')
+        list.each do |item|
+          lomadee_id = (item.css('form').css('input')[1].attr('name') == 'offer_id') ? item.css('form').css('input')[1].attr('value') : nil
+          offer_url = (item.css('form').css('input')[0].attr('name') == 'url') ? item.css('form').css('input')[0].attr('value') : nil
+          seller_id = (item.css('form').css('input')[2].attr('name') == 'emp_id') ?  item.css('form').css('input')[2].attr('value') : nil
+          prod << { 
+            :category_id =>  item.css('form').css('input')[4].attr('value').split('|')[9].to_i,
+            :lomadee_id => lomadee_id,
+            :product_id => item.css('form').css('input')[4].attr('value').split('|')[10].to_i,
+            :sku => nil, 
+            :offer_name => list.css('div').css('a').css('img')[0].attr('alt'),
+            :url => offer_url,
+            :offer => true, 
+            :price =>  item.css('form').attr('data-currentvalue').text.to_f, 
+            :seller => seller_id
+          }
+        end
+      end
+      prod
     end
 
     def get_suppliers
@@ -80,32 +106,5 @@ module Lomadee
       end
       prod
     end
-
-    def get_offers(category = nil)
-      prod = []
-      unless @server_url.nil?
-        url_page = "#{@server_url}service/findOfferList/lomadee/#{@api_id}/BR/?sourceId=#{@source_id}&CategoryId=#{category}&sort=dprice"
-        @page = Nokogiri::XML(open(url_page))
-        if !@page.nil? && !@page.css("details").css("status").nil? && @page.css("details").css("status").text == "success"
-          @page.css("offer").each do |item|
-            prod << { 
-              :category_id => item.attr("categoryId"),
-              :lomadee_id => item.attr("id"),
-              :product_id => item.attr("productId"),
-              :sku => item.css("sku").text, 
-              :offer_name => item.css("offerShortName").text,
-              :url =>  item.css('link').attr('url').text,
-              :offer => item.css('link').attr('type').text == "offer" ? true : false, 
-              :price => item.css('price').css('value').css('value').text, 
-              :seller => item.css('seller').attr('id').value.to_i
-            }
-          end
-        else
-          return nil
-        end
-      end
-      prod
-    end
-
   end
 end
