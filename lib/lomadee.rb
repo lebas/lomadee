@@ -35,9 +35,9 @@ module Lomadee
         list = @page.css('ul.offers-list__items').css('li.offers-list__item')
         list.each do |item|
           unless item.css('form').css('input').empty?
-            lomadee_id = (item.css('form').css('input')[1].attr('name') == 'offer_id') ? item.css('form').css('input')[1].attr('value') : nil
+            lomadee_id = (item.css('form').css('input')[1].attr('name') == 'offer_id') ? item.css('form').css('input')[1].attr('value').to_i : nil
             offer_url = (item.css('form').css('input')[0].attr('name') == 'url') ? item.css('form').css('input')[0].attr('value') : nil
-            seller_id = (item.css('form').css('input')[2].attr('name') == 'emp_id') ?  item.css('form').css('input')[2].attr('value') : nil
+            seller_id = (item.css('form').css('input')[2].attr('name') == 'emp_id') ?  item.css('form').css('input')[2].attr('value').to_i : nil
             prod << { 
               :category_id =>  item.css('form').css('input')[4].attr('value').split('|')[9].to_i,
               :lomadee_id => lomadee_id,
