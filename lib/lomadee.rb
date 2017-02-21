@@ -44,7 +44,7 @@ module Lomadee
               :product_id => item.css('form').css('input')[4].attr('value').split('|')[10].to_i,
               :sku => nil, 
               :offer_name => list.css('div').css('a').css('img')[0].attr('alt'),
-              :url => offer_url,
+              :url => self.add_link(offer_url),
               :offer => true, 
               :price =>  item.css('form').attr('data-currentvalue').text.to_f, 
               :seller => seller_id
