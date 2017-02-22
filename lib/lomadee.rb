@@ -22,7 +22,7 @@ module Lomadee
     ### lomadeezar links da Americanas, submarinio ... 
     def add_link(url = nil)
       unless @api_id.nil? || @source_id.nil? || url.nil?
-        if (url.upcase.include? 'HTTP://TRACKER')
+        if (url.upcase.include? '://TRACKER')
           page_mask = Nokogiri::HTML(open(url)).css('link').map{|item| item.attr('href') if item.attr('rel') == "canonical"}.compact
           url = page_mask[0] if page_mask.size == 1
         end
