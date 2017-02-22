@@ -22,10 +22,6 @@ module Lomadee
     ### lomadeezar links da Americanas, submarinio ... 
     def add_link(url = nil)
       unless @api_id.nil? || @source_id.nil? || url.nil?
-        if (url.upcase.include? '://TRACKER')
-          page_mask = Nokogiri::HTML(open(url)).css('link').map{|item| item.attr('href') if item.attr('rel') == "canonical"}.compact
-          url = page_mask[0] if page_mask.size == 1
-        end
         url_page = "#{@server_url}service/createLinks/lomadee/#{@api_id}/BR/?sourceId=#{@source_id}&link1=#{url}"
         @page = Nokogiri::XML(open(url_page))
         return @page.css("redirectLink").children.text unless @page.nil? || @page.css("redirectLink").nil? || @page.css("redirectLink").children.nil?
@@ -42,6 +38,12 @@ module Lomadee
             lomadee_id = (item.css('form').css('input')[1].attr('name') == 'offer_id') ? item.css('form').css('input')[1].attr('value').to_i : nil
             offer_url = (item.css('form').css('input')[0].attr('name') == 'url') ? item.css('form').css('input')[0].attr('value') : nil
             seller_id = (item.css('form').css('input')[2].attr('name') == 'emp_id') ?  item.css('form').css('input')[2].attr('value').to_i : nil
+
+            if (offer_url.upcase.include? "://TRACKER")
+              page_mask = Nokogiri::HTML(open(offer_url)).css('link').map{|item| item.attr('href') if item.attr('rel') == "canonical"}.compact
+              offer_url = page_mask[0] if page_mask.size == 1
+            end
+ 
             prod << { 
               :category_id =>  item.css('form').css('input')[4].attr('value').split('|')[9].to_i,
               :lomadee_id => lomadee_id,
