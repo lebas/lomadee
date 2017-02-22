@@ -22,6 +22,10 @@ module Lomadee
     ### lomadeezar links da Americanas, submarinio ... 
     def add_link(url = nil)
       unless @api_id.nil? || @source_id.nil? || url.nil?
+        if (url.upcase.include? 'HTTP://TRACKER')
+          page_mask = Nokogiri::HTML(open(url)).css('link').map{|item| item.attr('href') if item.attr('rel') == "canonical"}.compact
+          url = page_mask[0] if page_mask.size == 1
+        end
         url_page = "#{@server_url}service/createLinks/lomadee/#{@api_id}/BR/?sourceId=#{@source_id}&link1=#{url}"
         @page = Nokogiri::XML(open(url_page))
         return @page.css("redirectLink").children.text unless @page.nil? || @page.css("redirectLink").nil? || @page.css("redirectLink").children.nil?
