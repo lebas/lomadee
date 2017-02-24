@@ -39,7 +39,7 @@ module Lomadee
             offer_url = (item.css('form').css('input')[0].attr('name') == 'url') ? item.css('form').css('input')[0].attr('value') : nil
             seller_id = (item.css('form').css('input')[2].attr('name') == 'emp_id') ?  item.css('form').css('input')[2].attr('value').to_i : nil
 
-            link = url.split(' -> ')
+            link = offer_url.split(' -> ')
             url = link[1] if link.size == 2
             
             if (offer_url.upcase.include? "://TRACKER")
