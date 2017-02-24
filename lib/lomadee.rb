@@ -40,8 +40,7 @@ module Lomadee
             seller_id = (item.css('form').css('input')[2].attr('name') == 'emp_id') ?  item.css('form').css('input')[2].attr('value').to_i : nil
 
             link = offer_url.split(' -> ')
-            url = link[1] if link.size == 2
-            
+            offer_url = link[1] if link.size == 2
             if (offer_url.upcase.include? "://TRACKER")
               page_mask = Nokogiri::HTML(open(offer_url)).css('link').map{|item| item.attr('href') if item.attr('rel') == "canonical"}.compact
               offer_url = page_mask[0] if page_mask.size == 1
