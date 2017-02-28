@@ -44,13 +44,13 @@ module Lomadee
               if (offer_url.upcase.include? "://TRACKER")
                 begin
                   page_mask = Nokogiri::HTML(open(offer_url)).css('link').map{|item| item.attr('href') if item.attr('rel') == "canonical"}.compact
+                  offer_url = page_mask[0] if page_mask.size == 1
                 rescue OpenURI::HTTPError => error
                   puts ' ****** ERROR Lomadee GEM ***** '
                   puts offer_url
                   puts error.io.status
                   puts ' ****************************** '
                 end
-                offer_url = page_mask[0] if page_mask.size == 1
               end
               prod << { 
                 :category_id =>  item.css('form').css('input')[4].attr('value').split('|')[9].to_i,
