@@ -31,32 +31,45 @@ module Lomadee
     def read_buscape(buscape_url = nil)
       prod = []
       unless buscape_url.nil?
-        @page = Nokogiri::HTML(open(buscape_url))
-        list = @page.css('ul.offers-list__items').css('li.offers-list__item')
-        list.each do |item|
-          unless item.css('form').css('input').empty?
-            lomadee_id = (item.css('form').css('input')[1].attr('name') == 'offer_id') ? item.css('form').css('input')[1].attr('value').to_i : nil
-            offer_url = (item.css('form').css('input')[0].attr('name') == 'url') ? item.css('form').css('input')[0].attr('value') : nil
-            seller_id = (item.css('form').css('input')[2].attr('name') == 'emp_id') ?  item.css('form').css('input')[2].attr('value').to_i : nil
-
-            link = offer_url.split(' -> ')
-            offer_url = link[1] if link.size == 2
-            if (offer_url.upcase.include? "://TRACKER")
-              page_mask = Nokogiri::HTML(open(offer_url)).css('link').map{|item| item.attr('href') if item.attr('rel') == "canonical"}.compact
-              offer_url = page_mask[0] if page_mask.size == 1
-            end
-            prod << { 
-              :category_id =>  item.css('form').css('input')[4].attr('value').split('|')[9].to_i,
-              :lomadee_id => lomadee_id,
-              :product_id => item.css('form').css('input')[4].attr('value').split('|')[10].to_i,
-              :sku => nil, 
-              :offer_name => list.css('div').css('a').css('img')[0].attr('alt'),
-              :url => offer_url,
-              :offer => true, 
-              :price =>  item.css('form').attr('data-currentvalue').text.to_f, 
-              :seller => seller_id
-            }
+        begin
+          @page = Nokogiri::HTML(open(buscape_url))
+          list = @page.css('ul.offers-list__items').css('li.offers-list__item')
+          list.each do |item|
+            unless item.css('form').css('input').empty?
+              lomadee_id = (item.css('form').css('input')[1].attr('name') == 'offer_id') ? item.css('form').css('input')[1].attr('value').to_i : nil
+              offer_url = (item.css('form').css('input')[0].attr('name') == 'url') ? item.css('form').css('input')[0].attr('value') : nil
+              seller_id = (item.css('form').css('input')[2].attr('name') == 'emp_id') ?  item.css('form').css('input')[2].attr('value').to_i : nil
+              link = offer_url.split(' -> ')
+              offer_url = link[1] if link.size == 2
+              if (offer_url.upcase.include? "://TRACKER")
+                begin
+                  page_mask = Nokogiri::HTML(open(offer_url)).css('link').map{|item| item.attr('href') if item.attr('rel') == "canonical"}.compact
+                rescue OpenURI::HTTPError => error
+                  puts ' ****** ERROR Lomadee GEM ***** '
+                  puts offer_url
+                  puts error.io.status
+                  puts ' ****************************** '
+                end
+                offer_url = page_mask[0] if page_mask.size == 1
+              end
+              prod << { 
+                :category_id =>  item.css('form').css('input')[4].attr('value').split('|')[9].to_i,
+                :lomadee_id => lomadee_id,
+                :product_id => item.css('form').css('input')[4].attr('value').split('|')[10].to_i,
+                :sku => nil, 
+                :offer_name => list.css('div').css('a').css('img')[0].attr('alt'),
+                :url => offer_url,
+                :offer => true, 
+                :price =>  item.css('form').attr('data-currentvalue').text.to_f, 
+                :seller => seller_id
+              }
+            end 
           end
+        rescue OpenURI::HTTPError => error 
+          puts ' ****** ERROR Lomadee GEM ***** '
+          puts buscape_url
+          puts error.io.status
+          puts ' ****************************** '
         end
       end
       prod
