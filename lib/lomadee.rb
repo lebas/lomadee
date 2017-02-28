@@ -62,7 +62,7 @@ module Lomadee
                 :offer => true, 
                 :price =>  item.css('form').attr('data-currentvalue').text.to_f, 
                 :seller => seller_id
-              }
+              } unless (offer_url.upcase.include? "://TRACKER")
             end 
           end
         rescue OpenURI::HTTPError => error 

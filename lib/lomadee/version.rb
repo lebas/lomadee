@@ -1,3 +1,3 @@
 module Lomadee
-  VERSION = "0.9"
+  VERSION = "0.9.5"
 end
