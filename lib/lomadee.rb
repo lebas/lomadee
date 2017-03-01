@@ -43,7 +43,7 @@ module Lomadee
               offer_url = link[1] if link.size == 2
               if (offer_url.upcase.include? "://TRACKER")
                 begin
-                  page_mask = Nokogiri::HTML(open(offer_url)).css('link').map{|item| item.attr('href') if item.attr('rel') == "canonical"}.compact
+                  page_mask = Nokogiri::HTML(open(offer_url, :allow_redirections => :safe)).css('link').map{|item| item.attr('href') if item.attr('rel') == "canonical"}.compact
                   offer_url = page_mask[0] if page_mask.size == 1
                 rescue OpenURI::HTTPError => error
                   puts ' ****** ERROR Lomadee GEM ***** '
@@ -66,7 +66,7 @@ module Lomadee
             end 
           end
         rescue OpenURI::HTTPError => error 
-          puts ' ****** ERROR Lomadee GEM ***** '
+          puts ' ****** ERROR Lomadee GEM 2 ***** '
           puts buscape_url
           puts error.io.status
           puts ' ****************************** '
