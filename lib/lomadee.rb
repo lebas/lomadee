@@ -34,38 +34,25 @@ module Lomadee
       unless buscape_url.nil?
         begin
           @page = Nokogiri::HTML(open(buscape_url))
-          list = @page.css('ul.offers-list__items').css('li.offers-list__item')
+          list = @page.css('div.product-offers__container').css('li.product-offers__offer')
           list.each do |item|
             unless item.css('form').css('input').empty?
-              lomadee_id = (item.css('form').css('input')[1].attr('name') == 'offer_id') ? item.css('form').css('input')[1].attr('value').to_i : nil
-              offer_url = (item.css('form').css('input')[0].attr('name') == 'url') ? item.css('form').css('input')[0].attr('value') : nil
-              seller_id = (item.css('form').css('input')[2].attr('name') == 'emp_id') ?  item.css('form').css('input')[2].attr('value').to_i : nil
-              link = offer_url.split(' -> ')
-              offer_url = link[1] if link.size == 2
-              if (offer_url.upcase.include? "://TRACKER")
-                begin
-                  page_mask = Nokogiri::HTML(open(offer_url, :allow_redirections => :all)).css('link').map{|item| item.attr('href') if item.attr('rel') == "canonical"}.compact
-                  offer_url = page_mask[0] if page_mask.size == 1
-                rescue OpenURI::HTTPError => error
-                  puts ' ****** ERROR Lomadee GEM ***** '
-                  puts offer_url
-                  puts error.io.status
-                  puts ' ****************************** '
-                end
+              info = item.css('form').css('input')[11].attr('value').split('|') if item.css('form').css('input')[11].attr('name').eql?("pli") && !item.css('form').css('input')[11].attr('value').nil?
+              if info.size == 12
+                prod << { 
+                  :category_id =>  info[9].to_i,
+                  :lomadee_id => item.attr('data-log_id'),
+                  :product_id => info[10].to_i,
+                  :sku => nil, 
+                  :offer_name => item.css('form').css('input')[2].attr('value'),
+                  :url => "http://www.buscape.com.br#{item.css('div.offer__thumbnail a').attr('href').value}",
+                  :offer => true, 
+                  :price =>  info[5].to_f, 
+                  :seller => info[0].to_i
+                }
               end
-              prod << { 
-                :category_id =>  item.css('form').css('input')[4].attr('value').split('|')[9].to_i,
-                :lomadee_id => lomadee_id,
-                :product_id => item.css('form').css('input')[4].attr('value').split('|')[10].to_i,
-                :sku => nil, 
-                :offer_name => list.css('div').css('a').css('img')[0].attr('alt'),
-                :url => offer_url,
-                :offer => true, 
-                :price =>  item.css('form').attr('data-currentvalue').text.to_f, 
-                :seller => seller_id
-              } unless (offer_url.upcase.include? "://TRACKER")
-            end 
-          end
+            end
+          end 
         rescue OpenURI::HTTPError => error 
           puts ' ****** ERROR Lomadee GEM 2 ***** '
           puts buscape_url
