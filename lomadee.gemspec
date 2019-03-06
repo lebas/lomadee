@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'lomadee/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "lomadee"
+  spec.name          = "lomadee_s4m"
   spec.version       = Lomadee::VERSION
   spec.authors       = ["Eduardo Alencar"]
   spec.email         = ["lebas66@gmail.com"]
