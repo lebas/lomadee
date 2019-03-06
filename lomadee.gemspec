@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{Lomadee / Buscapé API for Rails}
   spec.description   = %q{Lomadee / Buscapé API for Rails}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.homepage      = "https://www.facebook.com/Solution4Mac/"
   spec.license       = "MIT"
 
   if spec.respond_to?(:metadata)
